@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "publish": "lerna publish --no-private",
+    "lerna": "lerna publish --no-private",
     "prettier": "prettier --write ."
   },
   "dependencies": {},
