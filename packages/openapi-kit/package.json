@@ -1,0 +1,23 @@
+{
+  "name": "openapi-kit",
+  "version": "0.0.0",
+  "author": {
+    "name": "Grégoire Mielle",
+    "email": "hello@greeeg.com"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "yarn build:types && yarn build:code",
+    "build:code": "esbuild src/index.ts --bundle --platform=node --packages=external --sourcemap --analyze --outfile=dist/index.js",
+    "build:types": "tsc --emitDeclarationOnly --declaration",
+    "dev": "concurrently \"yarn dev:esbuild\" \"yarn dev:tsc\"",
+    "dev:esbuild": "esbuild src/index.ts --bundle --platform=node --packages=external --outfile=dist/index.js --watch",
+    "dev:tsc": "tsc --emitDeclarationOnly --declaration --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "0.19.10",
+    "typescript": "5.3.3"
+  }
+}
