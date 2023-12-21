@@ -5,7 +5,7 @@
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "generate": "tsx scripts/generate.ts"
+    "openapi": "openapi-kit generate -f openapi/pet-store.yml -o ./generated"
   },
   "dependencies": {
     "react": "18.2.0",
