@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 18.x
       - name: Install dependencies
         run: yarn install
       - name: Typecheck openapi-kit
