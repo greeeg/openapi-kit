@@ -3,7 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import { ScriptTarget } from 'typescript'
 
-export function toValidIdentifier(text: string, target: ScriptTarget): string {
+export function toValidIdentifier(
+  text: string,
+  target: ScriptTarget = ScriptTarget.ES2021,
+): string {
   if (/^\d/.test(text)) {
     text = '$' + text
   }
@@ -31,7 +34,10 @@ export function toValidIdentifier(text: string, target: ScriptTarget): string {
   return res || '_'
 }
 
-export function toTypeName(text: string, target: ScriptTarget): string {
+export function toTypeName(
+  text: string,
+  target: ScriptTarget = ScriptTarget.ES2021,
+): string {
   if (/^\d/.test(text)) {
     text = '$' + text
   }

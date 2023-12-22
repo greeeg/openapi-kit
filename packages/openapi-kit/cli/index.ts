@@ -4,12 +4,12 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import {
-  dereferenceDocument,
   generateAPIClient,
   generateReactQueryHooks,
   generateTypeDefinitions,
   parseDocument,
 } from '../src'
+import { directoryExists, fileExists } from '../src/utils/fileSystem'
 
 interface RunOptions {
   openAPIFilePath: string
@@ -19,12 +19,11 @@ interface RunOptions {
 const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
   const filePath = path.resolve(process.cwd(), openAPIFilePath)
   const document = await parseDocument(filePath)
-  if (!document) {
-    return
-  }
 
-  const dereferencedDoc = await dereferenceDocument(filePath)
-  if (!dereferencedDoc) {
+  if (!document) {
+    console.log(
+      `OpenAPI document at "${filePath}" could not be parsed. Make sure it exists & is valid.`,
+    )
     return
   }
 
@@ -83,6 +82,16 @@ yargs(hideBin(process.argv))
       },
     },
     (argv) => {
+      if (!fileExists(argv.file)) {
+        console.log(`Invalid "${argv.file}" OpenAPI specification file path`)
+        return
+      }
+
+      if (!directoryExists(argv.outputDir)) {
+        console.log(`Invalid "${argv.outputDir}" output directory path`)
+        return
+      }
+
       run({ openAPIFilePath: argv.file, outputDirectoryPath: argv.outputDir })
         .then(() => {
           console.log('Done')

@@ -8,7 +8,6 @@
     "lerna": "lerna publish --no-private",
     "prettier": "prettier --write ."
   },
-  "dependencies": {},
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
     "lerna": "8.0.1",

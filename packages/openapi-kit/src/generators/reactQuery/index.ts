@@ -1,7 +1,7 @@
 import { OpenAPIDocument } from '../../types'
 import { writeFile } from '../../utils/fileSystem'
 import { formatOutput } from '../../utils/format'
-import { getOperations } from '../apiClient/functions'
+import { getOperations } from '../../utils/openAPI'
 import { buildMutation, buildQuery, getHeaderLines } from './functions'
 import { ReactQueryGeneratorOptions } from './types'
 

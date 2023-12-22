@@ -3,10 +3,24 @@ import get from 'lodash/get'
 import { OpenAPIV3 } from 'openapi-types'
 
 import { OpenAPIDocument } from '../types'
+import { fileExists } from './fileSystem'
+import { toTypeName, toValidIdentifier } from './typescript'
 
 export const isSchemaObject = (
   response: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 ): response is OpenAPIV3.SchemaObject => {
+  return !('$ref' in response)
+}
+
+export const isParameterObject = (
+  param: OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject,
+): param is OpenAPIV3.ParameterObject => {
+  return !!(param as OpenAPIV3.ParameterObject).name
+}
+
+export const isResponseObject = (
+  response: OpenAPIV3.ReferenceObject | OpenAPIV3.ResponseObject,
+): response is OpenAPIV3.ResponseObject => {
   return !('$ref' in response)
 }
 
@@ -42,6 +56,10 @@ const normalizeSchema = (schema: OpenAPIDocument): OpenAPIDocument => {
 export const parseDocument = async (
   filePath: string,
 ): Promise<OpenAPIDocument | null> => {
+  if (!fileExists(filePath)) {
+    return null
+  }
+
   try {
     const bundledSchemaWithInternalRefs = (await RefParser.bundle(
       filePath,
@@ -57,6 +75,10 @@ export const parseDocument = async (
 export const dereferenceDocument = async (
   filePath: string,
 ): Promise<OpenAPIDocument | null> => {
+  if (!fileExists(filePath)) {
+    return null
+  }
+
   try {
     const bundledSchemaWithInternalRefs = (await RefParser.dereference(
       filePath,
@@ -67,4 +89,40 @@ export const dereferenceDocument = async (
 
     return null
   }
+}
+
+const httpMethods = Object.values(OpenAPIV3.HttpMethods)
+
+export interface Operation {
+  path: string
+  httpMethod: OpenAPIV3.HttpMethods
+  operation: OpenAPIV3.OperationObject
+  camelCaseOperationId: string
+  pascalCaseOperationId: string
+}
+
+export const getOperations = (document: OpenAPIDocument) => {
+  const operations: Operation[] = []
+
+  for (const [path, properties = {}] of Object.entries(document.paths ?? {})) {
+    for (const httpMethod of httpMethods) {
+      const operation = properties[httpMethod]
+      if (!operation || !operation.operationId) {
+        continue
+      }
+
+      const camelCaseOperationId = toValidIdentifier(operation.operationId)
+      const pascalCaseOperationId = toTypeName(operation.operationId)
+
+      operations.push({
+        path,
+        httpMethod,
+        operation,
+        camelCaseOperationId,
+        pascalCaseOperationId,
+      })
+    }
+  }
+
+  return operations
 }

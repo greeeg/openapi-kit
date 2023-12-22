@@ -1,63 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types'
-import * as ts from 'typescript'
 
-import { OpenAPIDocument } from '../../types'
+import { Operation, isParameterObject } from '../../utils/openAPI'
 import { toValidIdentifier } from '../../utils/typescript'
-
-const httpMethods = Object.values(OpenAPIV3.HttpMethods)
-
-const capitalize = (s: string): string => {
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
-export interface Operation {
-  path: string
-  httpMethod: OpenAPIV3.HttpMethods
-  operation: OpenAPIV3.OperationObject
-  camelCaseOperationId: string
-  pascalCaseOperationId: string
-}
-
-export const getOperations = (document: OpenAPIDocument) => {
-  const operations: Operation[] = []
-
-  for (const [path, properties = {}] of Object.entries(document.paths ?? {})) {
-    for (const httpMethod of httpMethods) {
-      const operation = properties[httpMethod]
-      if (!operation || !operation.operationId) {
-        continue
-      }
-
-      const camelCaseOperationId = toValidIdentifier(
-        operation.operationId,
-        ts.ScriptTarget.ES2021,
-      )
-      const pascalCaseOperationId = capitalize(camelCaseOperationId)
-
-      operations.push({
-        path,
-        httpMethod,
-        operation,
-        camelCaseOperationId,
-        pascalCaseOperationId,
-      })
-    }
-  }
-
-  return operations
-}
-
-export const isParameterObject = (
-  param: OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject,
-): param is OpenAPIV3.ParameterObject => {
-  return !!(param as OpenAPIV3.ParameterObject).name
-}
-
-export const isResponseObject = (
-  response: OpenAPIV3.ReferenceObject | OpenAPIV3.ResponseObject,
-): response is OpenAPIV3.ResponseObject => {
-  return !('$ref' in response)
-}
 
 export const buildParamsInterface = (
   operationName: string,
@@ -95,7 +39,6 @@ export const buildFunction = ({
   const type = firstResponseName
     ? `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
         firstResponseName,
-        ts.ScriptTarget.ES2021,
       )}`
     : 'unknown'
 

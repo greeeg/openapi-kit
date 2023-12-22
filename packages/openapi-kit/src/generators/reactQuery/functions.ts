@@ -1,8 +1,8 @@
 import { OpenAPIV3 } from 'openapi-types'
 import * as ts from 'typescript'
 
+import { Operation, isParameterObject } from '../../utils/openAPI'
 import { toValidIdentifier } from '../../utils/typescript'
-import { Operation, isParameterObject } from '../apiClient/functions'
 import { ReactQueryGeneratorOptions } from './types'
 
 export const buildQueryParamsInterface = (
@@ -39,7 +39,6 @@ export const buildQuery = ({
   const responseType = firstResponseName
     ? `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
         firstResponseName,
-        ts.ScriptTarget.ES2021,
       )}`
     : 'unknown'
 
@@ -114,7 +113,6 @@ export const buildMutation = ({
   const responseType = firstResponseName
     ? `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
         firstResponseName,
-        ts.ScriptTarget.ES2021,
       )}`
     : 'unknown'
 

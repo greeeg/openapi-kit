@@ -1,11 +1,11 @@
 import { OpenAPIDocument } from '../../types'
 import { writeFile } from '../../utils/fileSystem'
 import { formatOutput } from '../../utils/format'
+import { getOperations } from '../../utils/openAPI'
 import {
   buildFunction,
   buildParamsInterface,
   getHeaderLines,
-  getOperations,
 } from './functions'
 import { APIClientGeneratorOptions } from './types'
 
