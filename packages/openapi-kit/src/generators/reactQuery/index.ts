@@ -18,8 +18,6 @@ export const generateReactQueryHooks = async (
   ]
   const operations = getOperations(document)
 
-  console.log(operations)
-
   operations
     .filter((operation) => operation.httpMethod === 'get')
     .forEach((operation) => {

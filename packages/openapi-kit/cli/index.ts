@@ -45,7 +45,7 @@ const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
     outputDirectoryPath,
     apiClientFileName,
   )
-  const reactQueryHooksFileName = 'reactQuery.ts'
+  const reactQueryHooksFileName = 'reactQuery.tsx'
   const reactQueryHooksOutputPath = path.resolve(
     process.cwd(),
     outputDirectoryPath,
