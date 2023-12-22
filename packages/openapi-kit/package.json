@@ -17,7 +17,8 @@
     "openapi-kit": "./dist/cli.js"
   },
   "scripts": {
-    "build": "yarn build:types && yarn build:code",
+    "typecheck": "tsc --noEmit",
+    "build": "yarn build:types && yarn build:code && yarn build:cli",
     "build:cli": "esbuild cli/index.ts --bundle --platform=node --packages=external --sourcemap --analyze --outfile=dist/cli.js",
     "build:code": "esbuild src/index.ts --bundle --platform=node --packages=external --sourcemap --analyze --outfile=dist/index.js",
     "build:types": "tsc --emitDeclarationOnly --declaration",

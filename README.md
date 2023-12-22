@@ -87,8 +87,8 @@ First, update your React App to include two React context providers:
 - One for your API client
 
 ```tsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { APIClientProvider } from 'generated/reactQuery'
-import { QueryClient, QueryClientProvider } from 'react-query'
 
 const queryClient = new QueryClient()
 

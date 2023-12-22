@@ -9,7 +9,7 @@ import {
   generateTypeDefinitions,
   parseDocument,
 } from '../src'
-import { directoryExists, fileExists } from '../src/utils/fileSystem'
+import { createDirectory, fileExists } from '../src/utils/fileSystem'
 
 interface RunOptions {
   openAPIFilePath: string
@@ -87,8 +87,11 @@ yargs(hideBin(process.argv))
         return
       }
 
-      if (!directoryExists(argv.outputDir)) {
-        console.log(`Invalid "${argv.outputDir}" output directory path`)
+      const directoryCreated = createDirectory(argv.outputDir)
+      if (!directoryCreated) {
+        console.log(
+          `An error ocurred while checking output directory "${argv.outputDir}"`,
+        )
         return
       }
 

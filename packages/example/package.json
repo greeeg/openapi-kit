@@ -5,9 +5,12 @@
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "openapi": "openapi-kit generate -f openapi/pet-store.yml -o ./generated"
+    "typecheck": "tsc --noEmit",
+    "openapi": "node ../openapi-kit/dist/cli.js generate -f openapi/pet-store.yml -o ./generated"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.14.2",
+    "query-string": "8.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
