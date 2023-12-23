@@ -1,8 +1,13 @@
 import RefParser from '@apidevtools/json-schema-ref-parser'
 import get from 'lodash/get'
-import { OpenAPIV3 } from 'openapi-types'
+import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types'
 
-import { OpenAPIDocument } from '../types'
+import {
+  OpenAPIArraySchemaObject,
+  OpenAPIDocument,
+  OpenAPINonArraySchemaObject,
+  OpenAPISchemaObject,
+} from '../types'
 import { fileExists } from './fileSystem'
 import { toTypeName, toValidIdentifier } from './typescript'
 
@@ -22,6 +27,28 @@ export const isResponseObject = (
   response: OpenAPIV3.ReferenceObject | OpenAPIV3.ResponseObject,
 ): response is OpenAPIV3.ResponseObject => {
   return !('$ref' in response)
+}
+
+export const isRefObject = (
+  response:
+    | OpenAPIV3.ReferenceObject
+    | OpenAPIV3.SchemaObject
+    | OpenAPIV3_1.ReferenceObject
+    | OpenAPIV3_1.SchemaObject,
+): response is OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject => {
+  return '$ref' in response
+}
+
+export const isArraySchemaObject = (
+  schemaObject: OpenAPISchemaObject,
+): schemaObject is OpenAPIArraySchemaObject => {
+  return 'items' in schemaObject
+}
+
+export const isNonArraySchemaObject = (
+  schemaObject: OpenAPISchemaObject,
+): schemaObject is OpenAPINonArraySchemaObject => {
+  return !('items' in schemaObject)
 }
 
 const normalizeSchema = (schema: OpenAPIDocument): OpenAPIDocument => {

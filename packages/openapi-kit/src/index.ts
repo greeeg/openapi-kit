@@ -1,4 +1,5 @@
 export { generateAPIClient } from './generators/apiClient'
 export { generateReactQueryHooks } from './generators/reactQuery'
 export { generateTypeDefinitions } from './generators/typeDefinitions'
+export { generateMockData } from './generators/mockData'
 export { parseDocument, dereferenceDocument } from './utils/openAPI'

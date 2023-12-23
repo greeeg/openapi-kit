@@ -4,7 +4,9 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import {
+  dereferenceDocument,
   generateAPIClient,
+  generateMockData,
   generateReactQueryHooks,
   generateTypeDefinitions,
   parseDocument,
@@ -19,8 +21,14 @@ interface RunOptions {
 const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
   const filePath = path.resolve(process.cwd(), openAPIFilePath)
   const document = await parseDocument(filePath)
-
   if (!document) {
+    console.log(
+      `OpenAPI document at "${filePath}" could not be parsed. Make sure it exists & is valid.`,
+    )
+    return
+  }
+  const dereferencedDocument = await dereferenceDocument(filePath)
+  if (!dereferencedDocument) {
     console.log(
       `OpenAPI document at "${filePath}" could not be parsed. Make sure it exists & is valid.`,
     )
@@ -44,6 +52,12 @@ const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
     outputDirectoryPath,
     apiClientFileName,
   )
+  const mockDataFileName = 'mockData.ts'
+  const mockOutputPath = path.resolve(
+    process.cwd(),
+    outputDirectoryPath,
+    mockDataFileName,
+  )
   const reactQueryHooksFileName = 'reactQuery.tsx'
   const reactQueryHooksOutputPath = path.resolve(
     process.cwd(),
@@ -54,6 +68,10 @@ const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
   generateTypeDefinitions(document, { outputPath: typeDefinitionsOutputPath })
   generateAPIClient(document, {
     outputPath: apiClientOutputPath,
+    typeDefinitionsImportPath,
+  })
+  generateMockData(dereferencedDocument, {
+    outputPath: mockOutputPath,
     typeDefinitionsImportPath,
   })
   generateReactQueryHooks(document, {
