@@ -11,6 +11,7 @@
 - Parse OpenAPI 3 & OpenAPI 3.1 YML/JSON documents
 - Generate Typescript types for OpenAPI components & paths
 - Generate a typed API client with named methods for OpenAPI operations
+- Generate mock data for OpenAPI operations
 - Generate [`react-query`](https://github.com/TanStack/query) query & mutation hooks for OpenAPI operations
 
 ## Getting started
@@ -76,6 +77,17 @@ const response = await apiClient.showPetById({
 
 if (response.ok) {
   console.log(response.data.name)
+}
+```
+
+### Using mock data
+
+```tsx
+import PetsList from 'components/PetsList'
+import { ListPetsResponse$200 } from 'generated/mockData'
+
+const App = () => {
+  return <PetsList data={ListPetsResponse$200} />
 }
 ```
 
