@@ -1,11 +1,16 @@
 import { faker } from '@faker-js/faker'
 
-import { OpenAPISchemaObject } from '../../types'
+import {
+  OpenAPIDocument,
+  OpenAPIRefObject,
+  OpenAPISchemaObject,
+} from '../../types'
 import {
   isArraySchemaObject,
   isNonArraySchemaObject,
   isRefObject,
   isSchemaObject,
+  resolveRef,
 } from '../../utils/openAPI'
 
 const getExampleOrFallback = (
@@ -80,24 +85,38 @@ const randomString = (schema: OpenAPISchemaObject) => {
   })
 }
 
-export const generateMock = (schema: OpenAPISchemaObject): unknown => {
-  let object: unknown = {}
+export const generateMock = (
+  currentSchema: OpenAPISchemaObject | OpenAPIRefObject | undefined,
+  document: OpenAPIDocument,
+): unknown => {
+  const schema = resolveRef(currentSchema, document)
+  if (!schema) {
+    if (currentSchema && isRefObject(currentSchema)) {
+      console.error(`Could not resolve $ref: ${currentSchema.$ref}`)
+    }
+    return
+  }
 
+  let object: unknown = {}
   if (isArraySchemaObject(schema)) {
     const itemShape = schema.items
-    // @ts-expect-error
-    if (!isSchemaObject(itemShape)) {
-      return null
+    const resolvedItemShape = resolveRef(itemShape, document)
+
+    if (!resolvedItemShape) {
+      if (isRefObject(itemShape)) {
+        console.error(`Could not resolve $ref: ${itemShape.$ref}`)
+      }
+      return
     }
 
     return Array.from({ length: randomArrayItemsCount() }).map(() =>
-      generateMock(itemShape),
+      generateMock(itemShape, document),
     )
   }
 
   // TODO: What to do with this?
   if (!isNonArraySchemaObject(schema)) {
-    return null
+    return
   }
 
   if ('nullable' in schema && schema.nullable) {
@@ -110,21 +129,21 @@ export const generateMock = (schema: OpenAPISchemaObject): unknown => {
     const validOptions = schema.anyOf.filter(
       (option) => !isRefObject(option),
     ) as OpenAPISchemaObject[]
-    return generateMock(randomElementFromArray(validOptions))
+    return generateMock(randomElementFromArray(validOptions), document)
   }
 
   if (schema.oneOf) {
     const validOptions = schema.oneOf.filter(
       (option) => !isRefObject(option),
     ) as OpenAPISchemaObject[]
-    return generateMock(randomElementFromArray(validOptions))
+    return generateMock(randomElementFromArray(validOptions), document)
   }
 
   if (schema.allOf) {
     const validOptions = schema.allOf.filter(
       (option) => !isRefObject(option),
     ) as OpenAPISchemaObject[]
-    return validOptions.map((option) => generateMock(option))
+    return validOptions.map((option) => generateMock(option, document))
   }
 
   switch (schema.type) {
@@ -151,12 +170,14 @@ export const generateMock = (schema: OpenAPISchemaObject): unknown => {
         for (const [propertyName, propertyValue] of Object.entries(
           schema.properties,
         )) {
-          if (!isSchemaObject(propertyValue)) {
+          if (!propertyValue || !isSchemaObject(propertyValue)) {
             continue
           }
 
-          ;(object as Record<string, unknown>)[propertyName] =
-            generateMock(propertyValue)
+          ;(object as Record<string, unknown>)[propertyName] = generateMock(
+            propertyValue,
+            document,
+          )
         }
       }
       break

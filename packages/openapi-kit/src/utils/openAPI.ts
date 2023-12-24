@@ -6,14 +6,15 @@ import {
   OpenAPIArraySchemaObject,
   OpenAPIDocument,
   OpenAPINonArraySchemaObject,
+  OpenAPIRefObject,
   OpenAPISchemaObject,
 } from '../types'
 import { fileExists } from './fileSystem'
 import { toTypeName, toValidIdentifier } from './typescript'
 
 export const isSchemaObject = (
-  response: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-): response is OpenAPIV3.SchemaObject => {
+  response: OpenAPIRefObject | OpenAPISchemaObject,
+): response is OpenAPISchemaObject => {
   return !('$ref' in response)
 }
 
@@ -184,4 +185,30 @@ export const getResponseType = ({
   return `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
     firstResponseName,
   )}`
+}
+
+export const resolveRef = (
+  refObject: OpenAPIRefObject | OpenAPISchemaObject | undefined,
+  rootSchema: OpenAPIDocument,
+): OpenAPISchemaObject | null => {
+  if (!refObject) {
+    return null
+  }
+
+  if (isSchemaObject(refObject)) {
+    return refObject
+  }
+
+  const path = refObject.$ref.replace('#/', '').split('/')
+  let current: any = rootSchema
+
+  for (let part of path) {
+    if (!(part in current)) {
+      return null
+    }
+
+    current = current[part]
+  }
+
+  return current
 }

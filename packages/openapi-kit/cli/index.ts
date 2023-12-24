@@ -4,7 +4,6 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import {
-  dereferenceDocument,
   generateAPIClient,
   generateMockData,
   generateReactQueryHooks,
@@ -22,13 +21,6 @@ const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
   const filePath = path.resolve(process.cwd(), openAPIFilePath)
   const document = await parseDocument(filePath)
   if (!document) {
-    console.log(
-      `OpenAPI document at "${filePath}" could not be parsed. Make sure it exists & is valid.`,
-    )
-    return
-  }
-  const dereferencedDocument = await dereferenceDocument(filePath)
-  if (!dereferencedDocument) {
     console.log(
       `OpenAPI document at "${filePath}" could not be parsed. Make sure it exists & is valid.`,
     )
@@ -70,7 +62,7 @@ const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
     outputPath: apiClientOutputPath,
     typeDefinitionsImportPath,
   })
-  generateMockData(dereferencedDocument, {
+  generateMockData(document, {
     outputPath: mockOutputPath,
     typeDefinitionsImportPath,
   })

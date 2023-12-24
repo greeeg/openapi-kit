@@ -3,11 +3,7 @@ import { capitalize } from 'lodash'
 import { OpenAPIDocument } from '../../types'
 import { writeFile } from '../../utils/fileSystem'
 import { formatOutput } from '../../utils/format'
-import {
-  getOperations,
-  isResponseObject,
-  isSchemaObject,
-} from '../../utils/openAPI'
+import { getOperations, isResponseObject } from '../../utils/openAPI'
 import { toTypeName, toValidIdentifier } from '../../utils/typescript'
 import { generateMock } from './functions'
 import { MockDataGeneratorOptions } from './types'
@@ -21,7 +17,7 @@ export const generateMockData = async (
     `import { Paths } from "${typeDefinitionsImportPath}";`,
   ]
 
-  operations.forEach(({ operation, pascalCaseOperationId, httpMethod }) => {
+  operations.forEach(({ operation, pascalCaseOperationId }) => {
     const responsesToMock = Object.entries(operation.responses)
 
     for (const [name, response] of responsesToMock) {
@@ -29,8 +25,8 @@ export const generateMockData = async (
         return
       }
 
-      const schema = response.content['application/json'].schema
-      if (!schema || !isSchemaObject(schema)) {
+      const schema = response.content['application/json']?.schema
+      if (!schema) {
         return
       }
 
@@ -44,7 +40,7 @@ export const generateMockData = async (
 
       lines.push(
         `export const ${mockName}: ${type} = ${JSON.stringify(
-          generateMock(schema),
+          generateMock(schema, document),
         )}`,
       )
     }

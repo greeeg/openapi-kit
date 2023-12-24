@@ -5,6 +5,9 @@ export type OpenAPIDocument = OpenAPIV3.Document | OpenAPIV3_1.Document
 export type OpenAPISchemaObject =
   | OpenAPIV3.SchemaObject
   | OpenAPIV3_1.SchemaObject
+export type OpenAPIRefObject =
+  | OpenAPIV3.ReferenceObject
+  | OpenAPIV3_1.ReferenceObject
 export type OpenAPINonArraySchemaObject =
   | OpenAPIV3.NonArraySchemaObject
   | OpenAPIV3_1.NonArraySchemaObject
