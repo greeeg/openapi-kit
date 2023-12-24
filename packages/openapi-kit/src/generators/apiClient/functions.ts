@@ -129,7 +129,7 @@ export const getHeaderLines = (typeDefinitionsImportPath: string) => [
   `  const fullUrl = [`,
   `    baseUrl,`,
   `    createPath(path, pathParams)`,
-  `  ].join("/");`,
+  `  ].join("");`,
   `  const query = queryParams`,
   `    ? queryString.stringify(queryParams, { arrayFormat: "comma" })`,
   `    : "";`,
