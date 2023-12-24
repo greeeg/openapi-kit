@@ -5,7 +5,7 @@ import { writeFile } from '../../utils/fileSystem'
 import { formatOutput } from '../../utils/format'
 import { getOperations, isResponseObject } from '../../utils/openAPI'
 import { toTypeName, toValidIdentifier } from '../../utils/typescript'
-import { generateMock } from './functions'
+import { generateMock, logResolvedRefsCallStackExceeded } from './functions'
 import { MockDataGeneratorOptions } from './types'
 
 export const generateMockData = async (
@@ -16,6 +16,8 @@ export const generateMockData = async (
   const lines: string[] = [
     `import { Paths } from "${typeDefinitionsImportPath}";`,
   ]
+
+  let resolvedRefs: Record<string, number> = {}
 
   operations.forEach(({ operation, pascalCaseOperationId }) => {
     const responsesToMock = Object.entries(operation.responses)
@@ -40,7 +42,7 @@ export const generateMockData = async (
 
       lines.push(
         `export const ${mockName}: ${type} = ${JSON.stringify(
-          generateMock(schema, document),
+          generateMock(schema, document, resolvedRefs),
         )}`,
       )
     }
@@ -48,4 +50,5 @@ export const generateMockData = async (
 
   const fileContent = await formatOutput(lines.join('\n'))
   writeFile(outputPath, fileContent)
+  logResolvedRefsCallStackExceeded(resolvedRefs)
 }

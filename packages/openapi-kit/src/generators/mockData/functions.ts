@@ -13,6 +13,8 @@ import {
   resolveRef,
 } from '../../utils/openAPI'
 
+const NESTED_REF_LIMIT = 100
+
 const getExampleOrFallback = (
   schema: OpenAPISchemaObject,
   fallback: () => unknown,
@@ -85,10 +87,57 @@ const randomString = (schema: OpenAPISchemaObject) => {
   })
 }
 
+const shouldPursueRefResolution = (
+  currentSchema: OpenAPISchemaObject | OpenAPIRefObject | undefined,
+  resolvedRefs: Record<string, number>,
+): {
+  shouldPursue: boolean
+  ref: string | undefined
+} => {
+  if (!currentSchema) {
+    return { shouldPursue: true, ref: undefined }
+  }
+
+  if (!isRefObject(currentSchema)) {
+    return { shouldPursue: true, ref: undefined }
+  }
+
+  resolvedRefs[currentSchema.$ref] = (resolvedRefs[currentSchema.$ref] ?? 0) + 1
+
+  if (resolvedRefs[currentSchema.$ref] > NESTED_REF_LIMIT) {
+    return { shouldPursue: false, ref: currentSchema.$ref }
+  }
+
+  return { shouldPursue: true, ref: currentSchema.$ref }
+}
+
+export const logResolvedRefsCallStackExceeded = (
+  resolvedRefs: Record<string, number>,
+) => {
+  const refs = Object.entries(resolvedRefs)
+    .filter(([, count]) => count > NESTED_REF_LIMIT)
+    .map(([ref]) => ref)
+
+  if (refs.length === 0) {
+    return
+  }
+
+  console.error(`Call stack exceeded for following $refs: ${refs.join(', ')}`)
+}
+
 export const generateMock = (
   currentSchema: OpenAPISchemaObject | OpenAPIRefObject | undefined,
   document: OpenAPIDocument,
+  resolvedRefs: Record<string, number>,
 ): unknown => {
+  const { shouldPursue, ref } = shouldPursueRefResolution(
+    currentSchema,
+    resolvedRefs,
+  )
+  if (!shouldPursue) {
+    return
+  }
+
   const schema = resolveRef(currentSchema, document)
   if (!schema) {
     if (currentSchema && isRefObject(currentSchema)) {
@@ -110,7 +159,7 @@ export const generateMock = (
     }
 
     return Array.from({ length: randomArrayItemsCount() }).map(() =>
-      generateMock(itemShape, document),
+      generateMock(itemShape, document, resolvedRefs),
     )
   }
 
@@ -129,21 +178,31 @@ export const generateMock = (
     const validOptions = schema.anyOf.filter(
       (option) => !isRefObject(option),
     ) as OpenAPISchemaObject[]
-    return generateMock(randomElementFromArray(validOptions), document)
+    return generateMock(
+      randomElementFromArray(validOptions),
+      document,
+      resolvedRefs,
+    )
   }
 
   if (schema.oneOf) {
     const validOptions = schema.oneOf.filter(
       (option) => !isRefObject(option),
     ) as OpenAPISchemaObject[]
-    return generateMock(randomElementFromArray(validOptions), document)
+    return generateMock(
+      randomElementFromArray(validOptions),
+      document,
+      resolvedRefs,
+    )
   }
 
   if (schema.allOf) {
     const validOptions = schema.allOf.filter(
       (option) => !isRefObject(option),
     ) as OpenAPISchemaObject[]
-    return validOptions.map((option) => generateMock(option, document))
+    return validOptions.map((option) =>
+      generateMock(option, document, resolvedRefs),
+    )
   }
 
   switch (schema.type) {
@@ -177,6 +236,7 @@ export const generateMock = (
           ;(object as Record<string, unknown>)[propertyName] = generateMock(
             propertyValue,
             document,
+            resolvedRefs,
           )
         }
       }

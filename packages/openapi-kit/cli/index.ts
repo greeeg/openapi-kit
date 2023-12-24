@@ -105,14 +105,13 @@ yargs(hideBin(process.argv))
         return
       }
 
-      run({ openAPIFilePath: argv.file, outputDirectoryPath: argv.outputDir })
-        .then(() => {
-          console.log('Done')
-        })
-        .catch(() => {
-          console.log('An error ocurred')
-          process.exit(1)
-        })
+      run({
+        openAPIFilePath: argv.file,
+        outputDirectoryPath: argv.outputDir,
+      }).catch(() => {
+        console.log('An error ocurred')
+        process.exit(1)
+      })
     },
   )
   .help()
