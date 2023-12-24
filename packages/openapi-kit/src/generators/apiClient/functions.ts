@@ -1,7 +1,10 @@
 import { OpenAPIV3 } from 'openapi-types'
 
-import { Operation, isParameterObject } from '../../utils/openAPI'
-import { toValidIdentifier } from '../../utils/typescript'
+import {
+  Operation,
+  getResponseType,
+  isParameterObject,
+} from '../../utils/openAPI'
 
 export const buildParamsInterface = (
   operationName: string,
@@ -35,12 +38,7 @@ export const buildFunction = ({
   operation,
   path,
 }: Operation) => {
-  const firstResponseName = Object.keys(operation.responses ?? {}).at(0)
-  const type = firstResponseName
-    ? `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
-        firstResponseName,
-      )}`
-    : 'unknown'
+  const type = getResponseType({ operation, pascalCaseOperationId })
 
   return [
     `const ${camelCaseOperationId} = async (params: ${pascalCaseOperationId}Params): Promise<APIClientResponse<${type}, unknown>> => {`,

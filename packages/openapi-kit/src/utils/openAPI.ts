@@ -153,3 +153,35 @@ export const getOperations = (document: OpenAPIDocument) => {
 
   return operations
 }
+
+export const getResponseType = ({
+  operation,
+  pascalCaseOperationId,
+}: Pick<Operation, 'operation' | 'pascalCaseOperationId'>) => {
+  const responseKeys = Object.keys(operation.responses ?? {})
+  const isRedirectResponse = (key: string) => key.startsWith('3')
+  const hasRedirectResponses = responseKeys.some(isRedirectResponse)
+
+  /**
+   * Avoid typing as invalid response HTTP status code
+   * Prefer `unknown` in this case
+   */
+  const firstResponseName = hasRedirectResponses
+    ? responseKeys
+        .filter(
+          (key) =>
+            !isRedirectResponse(key) &&
+            !key.startsWith('4') &&
+            !key.startsWith('5'),
+        )
+        .at(0)
+    : responseKeys.at(0)
+
+  if (!firstResponseName) {
+    return 'unknown'
+  }
+
+  return `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
+    firstResponseName,
+  )}`
+}

@@ -1,8 +1,10 @@
 import { OpenAPIV3 } from 'openapi-types'
-import * as ts from 'typescript'
 
-import { Operation, isParameterObject } from '../../utils/openAPI'
-import { toValidIdentifier } from '../../utils/typescript'
+import {
+  Operation,
+  getResponseType,
+  isParameterObject,
+} from '../../utils/openAPI'
 import { ReactQueryGeneratorOptions } from './types'
 
 export const buildQueryParamsInterface = (
@@ -35,12 +37,7 @@ export const buildQuery = ({
   camelCaseOperationId,
   operation,
 }: Operation) => {
-  const firstResponseName = Object.keys(operation.responses ?? {}).at(0)
-  const responseType = firstResponseName
-    ? `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
-        firstResponseName,
-      )}`
-    : 'unknown'
+  const responseType = getResponseType({ operation, pascalCaseOperationId })
 
   return [
     ...buildQueryParamsInterface(pascalCaseOperationId, operation),
@@ -109,12 +106,7 @@ export const buildMutation = ({
   camelCaseOperationId,
   operation,
 }: Operation) => {
-  const firstResponseName = Object.keys(operation.responses ?? {}).at(0)
-  const responseType = firstResponseName
-    ? `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
-        firstResponseName,
-      )}`
-    : 'unknown'
+  const responseType = getResponseType({ operation, pascalCaseOperationId })
 
   return [
     ...buildQueryParamsInterface(pascalCaseOperationId, operation),
