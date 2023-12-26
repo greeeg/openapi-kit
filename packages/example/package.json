@@ -6,7 +6,13 @@
     "start": "parcel index.html",
     "build": "parcel build index.html",
     "typecheck": "tsc --noEmit",
-    "openapi": "node ../openapi-kit/dist/cli.js generate -f openapi/pet-store.yml -o ./generated"
+    "openapi:pet-store": "node ../openapi-kit/dist/cli.js generate -f openapi/pet-store.yml -o ./generated/pet-store",
+    "openapi:stripe": "node ../openapi-kit/dist/cli.js generate -f openapi/stripe.yml -o ./generated/stripe",
+    "openapi:official:3.0:yml": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.0.yml -o ./generated/official-3.0-yml",
+    "openapi:official:3.0:json": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.0.json -o ./generated/official-3.0-json",
+    "openapi:official:3.1:yml": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.1.yml -o ./generated/official-3.1-yml",
+    "openapi:official:3.1:json": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.1.json -o ./generated/official-3.1-json",
+    "openapi": "concurrently \"yarn run openapi:pet-store\" \"yarn run openapi:stripe\" \"yarn run openapi:official:3.0:yml\" \"yarn run openapi:official:3.0:json\" \"yarn run openapi:official:3.1:yml\" \"yarn run openapi:official:3.1:json\""
   },
   "dependencies": {
     "@tanstack/react-query": "5.14.2",
@@ -17,6 +23,7 @@
   "devDependencies": {
     "@types/react": "18.2.45",
     "@types/react-dom": "18.2.18",
+    "concurrently": "8.2.2",
     "openapi-kit": "*",
     "parcel": "2.10.3",
     "tsx": "4.7.0",

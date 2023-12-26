@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import { APIClientProvider } from '../generated/reactQuery'
+import { APIClientProvider } from '../generated/pet-store/reactQuery'
 import PetsList from './PetsList'
 
 const queryClient = new QueryClient()

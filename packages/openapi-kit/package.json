@@ -23,7 +23,7 @@
     "build:cli": "esbuild cli/index.ts --bundle --platform=node --packages=external --sourcemap --analyze --outfile=dist/cli.js",
     "build:code": "esbuild src/index.ts --bundle --platform=node --packages=external --sourcemap --analyze --outfile=dist/index.js",
     "build:types": "tsc --emitDeclarationOnly --declaration",
-    "dev": "concurrently \"yarn dev:esbuild\" \"yarn dev:cli\" \"yarn dev:tsc\"",
+    "dev": "concurrently -n source,cli,typecheck -c blue,green,violet \"yarn dev:esbuild\" \"yarn dev:cli\" \"yarn dev:tsc\"",
     "dev:cli": "esbuild cli/index.ts --bundle --platform=node --packages=external --outfile=dist/cli.js --watch",
     "dev:esbuild": "esbuild src/index.ts --bundle --platform=node --packages=external --outfile=dist/index.js --watch",
     "dev:tsc": "tsc --emitDeclarationOnly --declaration --watch"

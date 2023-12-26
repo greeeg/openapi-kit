@@ -35,6 +35,6 @@ jobs:
       - name: Build openapi-kit
         run: yarn workspace openapi-kit build
       - name: Run openapi-kit in example
-        run: yarn workspace example openapi
+        run: yarn workspace example openapi:pet-store
       - name: Ensure example works as expected
         run: yarn workspace example typecheck && yarn workspace example build

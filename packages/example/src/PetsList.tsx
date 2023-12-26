@@ -1,5 +1,5 @@
-import { useListPets } from '../generated/reactQuery'
-import { Components, Paths } from '../generated/typeDefinitions'
+import { useListPets } from '../generated/pet-store/reactQuery'
+import { Components, Paths } from '../generated/pet-store/typeDefinitions'
 
 type Pet = Components.Schemas.Pet
 
