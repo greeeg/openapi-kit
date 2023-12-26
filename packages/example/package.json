@@ -8,11 +8,8 @@
     "typecheck": "tsc --noEmit",
     "openapi:pet-store": "node ../openapi-kit/dist/cli.js generate -f openapi/pet-store.yml -o ./generated/pet-store",
     "openapi:stripe": "node ../openapi-kit/dist/cli.js generate -f openapi/stripe.yml -o ./generated/stripe",
-    "openapi:official:3.0:yml": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.0.yml -o ./generated/official-3.0-yml",
-    "openapi:official:3.0:json": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.0.json -o ./generated/official-3.0-json",
-    "openapi:official:3.1:yml": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.1.yml -o ./generated/official-3.1-yml",
-    "openapi:official:3.1:json": "node ../openapi-kit/dist/cli.js generate -f openapi/official-3.1.json -o ./generated/official-3.1-json",
-    "openapi": "concurrently \"yarn run openapi:pet-store\" \"yarn run openapi:stripe\" \"yarn run openapi:official:3.0:yml\" \"yarn run openapi:official:3.0:json\" \"yarn run openapi:official:3.1:yml\" \"yarn run openapi:official:3.1:json\""
+    "openapi:twilio": "node ../openapi-kit/dist/cli.js generate -f openapi/twilio.json -o ./generated/twilio",
+    "openapi": "concurrently \"yarn run openapi:pet-store\" \"yarn run openapi:stripe\" \"yarn run openapi:github\""
   },
   "dependencies": {
     "@tanstack/react-query": "5.14.2",
