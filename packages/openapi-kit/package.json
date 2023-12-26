@@ -1,13 +1,19 @@
 {
   "name": "openapi-kit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Grégoire Mielle",
     "email": "hello@greeeg.com"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "keywords": ["openapi", "typegen", "typescript", "faker", "swagger"],
+  "keywords": [
+    "openapi",
+    "typegen",
+    "typescript",
+    "faker",
+    "swagger"
+  ],
   "homepage": "https://github.com/greeeg/openapi-kit",
   "repository": {
     "type": "git",
