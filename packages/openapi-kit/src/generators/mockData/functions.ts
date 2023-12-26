@@ -58,6 +58,10 @@ const randomNumber = (schema: OpenAPISchemaObject) => {
 const randomString = (schema: OpenAPISchemaObject) => {
   return getExampleOrFallback(schema, () => {
     if (schema.enum) {
+      if ('nullable' in schema && schema.nullable && randomBoolean()) {
+        return undefined
+      }
+
       return randomElementFromArray(schema.enum)
     }
 
@@ -69,6 +73,8 @@ const randomString = (schema: OpenAPISchemaObject) => {
           return faker.internet.url()
         case 'date':
           return faker.date.past().toISOString().split('T')[0]
+        case 'date-time-rfc-2822':
+          return faker.date.past().toUTCString()
         case 'date-time':
         case 'datetime':
           return faker.date.past().toISOString()
@@ -130,7 +136,7 @@ export const generateMock = (
   document: OpenAPIDocument,
   resolvedRefs: Record<string, number>,
 ): unknown => {
-  const { shouldPursue, ref } = shouldPursueRefResolution(
+  const { shouldPursue } = shouldPursueRefResolution(
     currentSchema,
     resolvedRefs,
   )
@@ -146,7 +152,7 @@ export const generateMock = (
     return
   }
 
-  let object: unknown = {}
+  let object: unknown = undefined
   if (isArraySchemaObject(schema)) {
     const itemShape = schema.items
     const resolvedItemShape = resolveRef(itemShape, document)
@@ -168,7 +174,8 @@ export const generateMock = (
     return
   }
 
-  if ('nullable' in schema && schema.nullable) {
+  // Nullable enums can only be `undefined`, not `null`
+  if ('nullable' in schema && schema.nullable && !schema.enum) {
     if (randomBoolean()) {
       return null
     }

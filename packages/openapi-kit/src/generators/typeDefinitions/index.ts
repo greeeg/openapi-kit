@@ -13,7 +13,14 @@ export const generateTypeDefinitions = async (
 
   const result = await generator({
     contents: [schema],
+  }).catch((err) => {
+    console.error('Could not generate type definitions', String(err))
+    return null
   })
+
+  if (!result) {
+    return
+  }
 
   const fileContent = await formatOutput(
     result.replace(/declare namespace/g, 'export declare namespace'),

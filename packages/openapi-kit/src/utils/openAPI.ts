@@ -159,30 +159,42 @@ export const getResponseType = ({
   operation,
   pascalCaseOperationId,
 }: Pick<Operation, 'operation' | 'pascalCaseOperationId'>) => {
-  const responseKeys = Object.keys(operation.responses ?? {})
-  const isRedirectResponse = (key: string) => key.startsWith('3')
-  const hasRedirectResponses = responseKeys.some(isRedirectResponse)
-
-  /**
-   * Avoid typing as invalid response HTTP status code
-   * Prefer `unknown` in this case
-   */
-  const firstResponseName = hasRedirectResponses
-    ? responseKeys
-        .filter(
-          (key) =>
-            !isRedirectResponse(key) &&
-            !key.startsWith('4') &&
-            !key.startsWith('5'),
-        )
-        .at(0)
-    : responseKeys.at(0)
-
-  if (!firstResponseName) {
+  if (!operation.responses) {
     return 'unknown'
   }
 
-  return `Paths.${pascalCaseOperationId}.Responses.${toValidIdentifier(
+  const firstResponse = Object.entries(operation.responses).find(
+    ([key, value]) => {
+      const isRedirect = key.startsWith('3')
+      const isInvalid = key.startsWith('4') || key.startsWith('5')
+      if (isRedirect || isInvalid) {
+        return false
+      }
+
+      if (isRefObject(value)) {
+        return false
+      }
+
+      return true
+    },
+  )
+  if (!firstResponse) {
+    return 'unknown'
+  }
+
+  const [firstResponseName, firstResponseObject] = firstResponse
+  if (!isResponseObject(firstResponseObject)) {
+    return 'unknown'
+  }
+
+  const hasTypedContent =
+    firstResponseObject.content &&
+    'application/json' in firstResponseObject.content
+  if (!hasTypedContent) {
+    return 'unknown'
+  }
+
+  return `Paths.${pascalCaseOperationId}.Responses.${toTypeName(
     firstResponseName,
   )}`
 }
