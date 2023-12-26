@@ -1,5 +1,6 @@
-export interface ReactQueryGeneratorOptions {
+import { GeneratorOptions } from '../types'
+
+export interface ReactQueryGeneratorOptions extends GeneratorOptions {
   typeDefinitionsImportPath: string
   apiClientImportPath: string
-  outputPath: string
 }

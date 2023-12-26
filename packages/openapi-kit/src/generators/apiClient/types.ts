@@ -1,4 +1,5 @@
-export interface APIClientGeneratorOptions {
+import { GeneratorOptions } from '../types'
+
+export interface APIClientGeneratorOptions extends GeneratorOptions {
   typeDefinitionsImportPath: string
-  outputPath: string
 }

@@ -170,8 +170,8 @@ const run = () => {
     return
   }
 
-  generateTypeDefinitions(document, { outputPath: './client/generated/types.ts' })
-  generateTypeDefinitions(document, { outputPath: './api/generated/types.ts' })
+  generateTypeDefinitions(document, { outputFilePath: './client/generated/types.ts' })
+  generateTypeDefinitions(document, { outputFilePath: './api/generated/types.ts' })
 }
 
 run()

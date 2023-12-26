@@ -15,9 +15,14 @@ import { createDirectory, fileExists } from '../src/utils/fileSystem'
 interface RunOptions {
   openAPIFilePath: string
   outputDirectoryPath: string
+  prettyOutput: boolean
 }
 
-const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
+const run = async ({
+  openAPIFilePath,
+  outputDirectoryPath,
+  prettyOutput,
+}: RunOptions) => {
   const filePath = path.resolve(process.cwd(), openAPIFilePath)
   const document = await parseDocument(filePath)
   if (!document) {
@@ -32,44 +37,50 @@ const run = async ({ openAPIFilePath, outputDirectoryPath }: RunOptions) => {
     '.ts',
     '',
   )}`
-  const typeDefinitionsOutputPath = path.resolve(
+  const typeDefinitionsOutputFilePath = path.resolve(
     process.cwd(),
     outputDirectoryPath,
     typeDefinitionsFileName,
   )
   const apiClientFileName = 'apiClient.ts'
   const apiClientImportPath = `./${apiClientFileName.replace('.ts', '')}`
-  const apiClientOutputPath = path.resolve(
+  const apiClientOutputFilePath = path.resolve(
     process.cwd(),
     outputDirectoryPath,
     apiClientFileName,
   )
   const mockDataFileName = 'mockData.ts'
-  const mockOutputPath = path.resolve(
+  const mockOutputFilePath = path.resolve(
     process.cwd(),
     outputDirectoryPath,
     mockDataFileName,
   )
   const reactQueryHooksFileName = 'reactQuery.tsx'
-  const reactQueryHooksOutputPath = path.resolve(
+  const reactQueryHooksOutputFilePath = path.resolve(
     process.cwd(),
     outputDirectoryPath,
     reactQueryHooksFileName,
   )
 
-  generateTypeDefinitions(document, { outputPath: typeDefinitionsOutputPath })
+  generateTypeDefinitions(document, {
+    outputFilePath: typeDefinitionsOutputFilePath,
+    prettyOutput,
+  })
   generateAPIClient(document, {
-    outputPath: apiClientOutputPath,
+    outputFilePath: apiClientOutputFilePath,
     typeDefinitionsImportPath,
+    prettyOutput,
   })
   generateMockData(document, {
-    outputPath: mockOutputPath,
+    outputFilePath: mockOutputFilePath,
     typeDefinitionsImportPath,
+    prettyOutput,
   })
   generateReactQueryHooks(document, {
-    outputPath: reactQueryHooksOutputPath,
+    outputFilePath: reactQueryHooksOutputFilePath,
     typeDefinitionsImportPath,
     apiClientImportPath,
+    prettyOutput,
   })
 }
 
@@ -90,6 +101,12 @@ yargs(hideBin(process.argv))
         describe: 'Output directory',
         demandOption: true,
       },
+      prettyOutput: {
+        type: 'boolean',
+        default: false,
+        describe: 'Wether or not the output should be formatted using Prettier',
+        demandOption: false,
+      },
     },
     (argv) => {
       if (!fileExists(argv.file)) {
@@ -108,6 +125,7 @@ yargs(hideBin(process.argv))
       run({
         openAPIFilePath: argv.file,
         outputDirectoryPath: argv.outputDir,
+        prettyOutput: argv.prettyOutput,
       }).catch(() => {
         console.log('An error ocurred')
         process.exit(1)

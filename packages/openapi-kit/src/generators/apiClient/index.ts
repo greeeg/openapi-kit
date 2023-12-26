@@ -11,7 +11,11 @@ import { APIClientGeneratorOptions } from './types'
 
 export const generateAPIClient = async (
   document: OpenAPIDocument,
-  { outputPath, typeDefinitionsImportPath }: APIClientGeneratorOptions,
+  {
+    outputFilePath,
+    typeDefinitionsImportPath,
+    prettyOutput = false,
+  }: APIClientGeneratorOptions,
 ) => {
   const lines: string[] = [...getHeaderLines(typeDefinitionsImportPath)]
   const operations = getOperations(document)
@@ -43,6 +47,6 @@ export const generateAPIClient = async (
     'export type APIClient = ReturnType<typeof getAPIClient>',
   )
 
-  const fileContent = await formatOutput(lines.join('\n'))
-  writeFile(outputPath, fileContent)
+  const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
+  writeFile(outputFilePath, fileContent)
 }

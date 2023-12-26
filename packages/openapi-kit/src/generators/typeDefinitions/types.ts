@@ -1,3 +1,3 @@
-export interface TypeDefinitionsGeneratorOptions {
-  outputPath: string
-}
+import { GeneratorOptions } from '../types'
+
+export interface TypeDefinitionsGeneratorOptions extends GeneratorOptions {}

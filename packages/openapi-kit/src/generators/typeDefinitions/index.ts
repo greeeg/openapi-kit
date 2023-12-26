@@ -7,7 +7,7 @@ import { TypeDefinitionsGeneratorOptions } from './types'
 
 export const generateTypeDefinitions = async (
   document: OpenAPIDocument,
-  { outputPath }: TypeDefinitionsGeneratorOptions,
+  { outputFilePath, prettyOutput = false }: TypeDefinitionsGeneratorOptions,
 ) => {
   const schema = parseSchema(document as JsonSchema)
 
@@ -24,7 +24,8 @@ export const generateTypeDefinitions = async (
 
   const fileContent = await formatOutput(
     result.replace(/declare namespace/g, 'export declare namespace'),
+    prettyOutput,
   )
 
-  writeFile(outputPath, fileContent)
+  writeFile(outputFilePath, fileContent)
 }

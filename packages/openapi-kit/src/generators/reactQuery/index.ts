@@ -8,9 +8,10 @@ import { ReactQueryGeneratorOptions } from './types'
 export const generateReactQueryHooks = async (
   document: OpenAPIDocument,
   {
-    outputPath,
+    outputFilePath,
     typeDefinitionsImportPath,
     apiClientImportPath,
+    prettyOutput = false,
   }: ReactQueryGeneratorOptions,
 ) => {
   const lines: string[] = [
@@ -30,7 +31,7 @@ export const generateReactQueryHooks = async (
       lines.push(...buildMutation(operation))
     })
 
-  const fileContent = await formatOutput(lines.join('\n'))
+  const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
 
-  writeFile(outputPath, fileContent)
+  writeFile(outputFilePath, fileContent)
 }

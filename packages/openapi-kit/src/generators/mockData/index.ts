@@ -1,16 +1,18 @@
-import { capitalize } from 'lodash'
-
 import { OpenAPIDocument } from '../../types'
 import { writeFile } from '../../utils/fileSystem'
 import { formatOutput } from '../../utils/format'
 import { getOperations, isResponseObject } from '../../utils/openAPI'
-import { toTypeName, toValidIdentifier } from '../../utils/typescript'
+import { toTypeName } from '../../utils/typescript'
 import { generateMock, logResolvedRefsCallStackExceeded } from './functions'
 import { MockDataGeneratorOptions } from './types'
 
 export const generateMockData = async (
   document: OpenAPIDocument,
-  { outputPath, typeDefinitionsImportPath }: MockDataGeneratorOptions,
+  {
+    outputFilePath,
+    typeDefinitionsImportPath,
+    prettyOutput = false,
+  }: MockDataGeneratorOptions,
 ) => {
   const operations = getOperations(document)
   const lines: string[] = [
@@ -32,10 +34,7 @@ export const generateMockData = async (
         return
       }
 
-      const mockName = `${pascalCaseOperationId}Response${capitalize(
-        toValidIdentifier(name),
-      )}`
-
+      const mockName = `${pascalCaseOperationId}Response${toTypeName(name)}`
       const type = `Paths.${pascalCaseOperationId}.Responses.${toTypeName(
         name,
       )}`
@@ -48,7 +47,7 @@ export const generateMockData = async (
     }
   })
 
-  const fileContent = await formatOutput(lines.join('\n'))
-  writeFile(outputPath, fileContent)
+  const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
+  writeFile(outputFilePath, fileContent)
   logResolvedRefsCallStackExceeded(resolvedRefs)
 }
