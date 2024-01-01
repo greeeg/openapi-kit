@@ -3,30 +3,26 @@ import { OpenAPIV3 } from 'openapi-types'
 import {
   Operation,
   getResponseType,
-  isParameterObject,
+  hasOperationParameters,
 } from '../../utils/openAPI'
 
 export const buildParamsInterface = (
   operationName: string,
   operation: OpenAPIV3.OperationObject,
 ): string[] => {
-  const hasPathParameters = !!operation.parameters
-    ?.filter(isParameterObject)
-    .some((param) => param.in === 'path')
-  const hasQueryParameters = !!operation.parameters
-    ?.filter(isParameterObject)
-    .some((param) => param.in === 'query')
-  const hasBodyParameters = !!operation.requestBody
+  const { has, inBody, inPath, inQuery } = hasOperationParameters(operation)
+
+  if (!has) {
+    return []
+  }
 
   return [
     `interface ${operationName}Params extends Params {`,
-    ...(hasPathParameters
-      ? [`pathParams: Paths.${operationName}.PathParameters,`]
-      : []),
-    ...(hasQueryParameters
+    ...(inPath ? [`pathParams: Paths.${operationName}.PathParameters,`] : []),
+    ...(inQuery
       ? [`queryParams: Paths.${operationName}.QueryParameters,`]
       : []),
-    ...(hasBodyParameters ? [`body: Paths.${operationName}.RequestBody,`] : []),
+    ...(inBody ? [`body: Paths.${operationName}.RequestBody,`] : []),
     `}`,
   ]
 }
@@ -38,20 +34,26 @@ export const buildFunction = ({
   operation,
   path,
 }: Operation) => {
+  const { has, inBody, inPath, inQuery } = hasOperationParameters(operation)
+  const params = has ? `params: ${pascalCaseOperationId}Params` : ''
   const type = getResponseType({ operation, pascalCaseOperationId })
 
   return [
-    `const ${camelCaseOperationId} = async (params: ${pascalCaseOperationId}Params): Promise<APIClientResponse<${type}, unknown>> => {`,
+    `const ${camelCaseOperationId} = async (${params}): Promise<APIClientResponse<${type}, unknown>> => {`,
     `  const response = await fetch(`,
     `    createUrl({`,
     `      baseUrl: config.baseUrl,`,
-    `      path: createPath("${path}", params.pathParams),`,
-    `      pathParams: params.pathParams,`,
-    `      queryParams: params.queryParams`,
+    ...(inPath
+      ? [
+          `path: createPath("${path}", params.pathParams),`,
+          'pathParams: params.pathParams,',
+        ]
+      : [`path: createPath("${path}"),`]),
+    ...(inQuery ? [`queryParams: params.queryParams,`] : []),
     `    }),`,
     `    {`,
     `      method: "${httpMethod}",`,
-    ...(operation.requestBody ? [`body: JSON.stringify(params.body),`] : []),
+    ...(inBody ? [`body: JSON.stringify(params.body),`] : []),
     `      headers: {`,
     `        "Content-Type": "application/json",`,
     `        ...headers`,

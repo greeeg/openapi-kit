@@ -101,6 +101,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /config:
+    get:
+      summary: Get config
+      operationId: getConfig
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  config:
+                    type: string
+                    description: Config
+                    example: '{"a":1}'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   parameters:
     owner:

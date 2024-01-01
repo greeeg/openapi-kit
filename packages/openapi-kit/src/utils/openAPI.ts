@@ -224,3 +224,22 @@ export const resolveRef = (
 
   return current
 }
+
+export const hasOperationParameters = (
+  operation: OpenAPIV3.OperationObject,
+) => {
+  const inPath = !!operation.parameters
+    ?.filter(isParameterObject)
+    .some((param) => param.in === 'path')
+  const inQuery = !!operation.parameters
+    ?.filter(isParameterObject)
+    .some((param) => param.in === 'query')
+  const inBody = !!operation.requestBody
+
+  return {
+    has: inPath || inQuery || inBody,
+    inPath,
+    inQuery,
+    inBody,
+  }
+}

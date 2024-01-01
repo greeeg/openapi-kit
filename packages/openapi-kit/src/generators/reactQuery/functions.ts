@@ -3,31 +3,52 @@ import { OpenAPIV3 } from 'openapi-types'
 import {
   Operation,
   getResponseType,
-  isParameterObject,
+  hasOperationParameters,
 } from '../../utils/openAPI'
 import { ReactQueryGeneratorOptions } from './types'
 
-export const buildQueryParamsInterface = (
+const buildQueryParamsInterface = (
   operationName: string,
   operation: OpenAPIV3.OperationObject,
 ): string[] => {
-  const hasPathParameters = !!operation.parameters
-    ?.filter(isParameterObject)
-    .some((param) => param.in === 'path')
-  const hasQueryParameters = !!operation.parameters
-    ?.filter(isParameterObject)
-    .some((param) => param.in === 'query')
-  const hasBodyParameters = !!operation.requestBody
+  const { has, inBody, inPath, inQuery } = hasOperationParameters(operation)
+
+  if (!has) {
+    return []
+  }
 
   return [
     `export interface ${operationName}Parameters {`,
-    ...(hasPathParameters
-      ? [`pathParams: Paths.${operationName}.PathParameters,`]
-      : []),
-    ...(hasQueryParameters
+    ...(inPath ? [`pathParams: Paths.${operationName}.PathParameters,`] : []),
+    ...(inQuery
       ? [`queryParams: Paths.${operationName}.QueryParameters,`]
       : []),
-    ...(hasBodyParameters ? [`body: Paths.${operationName}.RequestBody,`] : []),
+    ...(inBody ? [`body: Paths.${operationName}.RequestBody,`] : []),
+    `}`,
+  ]
+}
+
+const buildQueryKeyFunction = ({
+  operation,
+  pascalCaseOperationId,
+  camelCaseOperationId,
+}: Pick<
+  Operation,
+  'camelCaseOperationId' | 'pascalCaseOperationId' | 'operation'
+>): string[] => {
+  const { has } = hasOperationParameters(operation)
+
+  if (!has) {
+    return [
+      `export const get${pascalCaseOperationId}QueryKey = () => {`,
+      `  return ['${camelCaseOperationId}']`,
+      `}`,
+    ]
+  }
+
+  return [
+    `export const get${pascalCaseOperationId}QueryKey = (parameters?: ${pascalCaseOperationId}Parameters | Partial<${pascalCaseOperationId}Parameters>) => {`,
+    `  return parameters ? ['${camelCaseOperationId}', parameters] : ['${camelCaseOperationId}']`,
     `}`,
   ]
 }
@@ -37,29 +58,34 @@ export const buildQuery = ({
   camelCaseOperationId,
   operation,
 }: Operation) => {
+  const { has } = hasOperationParameters(operation)
   const responseType = getResponseType({ operation, pascalCaseOperationId })
 
   return [
     ...buildQueryParamsInterface(pascalCaseOperationId, operation),
     ``,
-    `export const get${pascalCaseOperationId}QueryKey = (parameters?: ${pascalCaseOperationId}Parameters | Partial<${pascalCaseOperationId}Parameters>) => {`,
-    `  return parameters ? ['${camelCaseOperationId}', parameters] : ['${camelCaseOperationId}']`,
-    `}`,
+    ...buildQueryKeyFunction({
+      camelCaseOperationId,
+      pascalCaseOperationId,
+      operation,
+    }),
     ``,
     `export const use${pascalCaseOperationId} = (`,
-    `  parameters: ${pascalCaseOperationId}Parameters,`,
+    ...(has ? [`parameters: ${pascalCaseOperationId}Parameters,`] : []),
     `  options?: Omit<UseQueryOptions<${responseType}, unknown>,`,
     `    'queryKey' | 'queryFn'`,
     `  >`,
     `) => {`,
     `  const apiClient = useAPIClient()`,
-    `  const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`,
+    ...(has
+      ? [`const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
+      : [`const queryKey = get${pascalCaseOperationId}QueryKey()`]),
     ``,
     `  return useQuery<${responseType}, unknown>({`,
     `    queryKey,`,
     `    queryFn: async () => {`,
     `      const response = await apiClient.${camelCaseOperationId}(`,
-    `        parameters`,
+    ...(has ? ['parameters'] : []),
     `      )`,
     ``,
     `      if (!response.ok) {`,
@@ -73,19 +99,23 @@ export const buildQuery = ({
     `}`,
     ``,
     `export const useLazy${pascalCaseOperationId} = (`,
-    `  parameters: Partial<${pascalCaseOperationId}Parameters>,`,
+    ...(has
+      ? [`parameters: Partial<${pascalCaseOperationId}Parameters>,`]
+      : []),
     `  options?: Omit<UseQueryOptions<${responseType}, unknown>,`,
     `    'queryKey' | 'queryFn'`,
     `  >`,
     `) => {`,
     `  const apiClient = useAPIClient()`,
-    `  const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`,
+    ...(has
+      ? [`const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
+      : [`const queryKey = get${pascalCaseOperationId}QueryKey()`]),
     ``,
     `  return useQuery<${responseType}, unknown>({`,
     `    queryKey,`,
     `    queryFn: async () => {`,
     `      const response = await apiClient.${camelCaseOperationId}(`,
-    `        parameters as ${pascalCaseOperationId}Parameters`,
+    ...(has ? [`parameters as ${pascalCaseOperationId}Parameters`] : []),
     `      )`,
     ``,
     `      if (!response.ok) {`,
@@ -106,6 +136,7 @@ export const buildMutation = ({
   camelCaseOperationId,
   operation,
 }: Operation) => {
+  const { has } = hasOperationParameters(operation)
   const responseType = getResponseType({ operation, pascalCaseOperationId })
 
   return [
@@ -125,8 +156,15 @@ export const buildMutation = ({
     `    unknown,`,
     `    ${pascalCaseOperationId}Parameters`,
     `  >({`,
-    `    mutationFn: async (variables: ${pascalCaseOperationId}Parameters) => {`,
-    `      const response = await apiClient.${camelCaseOperationId}(variables);`,
+    ...(has
+      ? [
+          `mutationFn: async (variables: ${pascalCaseOperationId}Parameters) => {`,
+          `const response = await apiClient.${camelCaseOperationId}(variables);`,
+        ]
+      : [
+          `mutationFn: async () => {`,
+          `const response = await apiClient.${camelCaseOperationId}();`,
+        ]),
     ``,
     `      if (!response.ok) {`,
     `        return Promise.reject(response);`,
