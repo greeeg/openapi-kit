@@ -67,6 +67,9 @@ const apiClient = getAPIClient({
   headers: {
     Accept: 'application/json',
   },
+  onError: (statusCode: number, response: Response) => {
+    console.log(`[network-error]: ${statusCode} status code`, response)
+  },
 })
 
 const response = await apiClient.showPetById({
