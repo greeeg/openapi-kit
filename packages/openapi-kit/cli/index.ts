@@ -1,88 +1,10 @@
 #!/usr/bin/env node
-import path from 'path'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
-import {
-  generateAPIClient,
-  generateMockData,
-  generateReactQueryHooks,
-  generateTypeDefinitions,
-  parseDocument,
-} from '../src'
 import { createDirectory, fileExists } from '../src/utils/fileSystem'
-
-interface RunOptions {
-  openAPIFilePath: string
-  outputDirectoryPath: string
-  prettyOutput: boolean
-}
-
-const run = async ({
-  openAPIFilePath,
-  outputDirectoryPath,
-  prettyOutput,
-}: RunOptions) => {
-  const filePath = path.resolve(process.cwd(), openAPIFilePath)
-  const document = await parseDocument(filePath)
-  if (!document) {
-    console.log(
-      `OpenAPI document at "${filePath}" could not be parsed. Make sure it exists & is valid.`,
-    )
-    return
-  }
-
-  const typeDefinitionsFileName = 'typeDefinitions.ts'
-  const typeDefinitionsImportPath = `./${typeDefinitionsFileName.replace(
-    '.ts',
-    '',
-  )}`
-  const typeDefinitionsOutputFilePath = path.resolve(
-    process.cwd(),
-    outputDirectoryPath,
-    typeDefinitionsFileName,
-  )
-  const apiClientFileName = 'apiClient.ts'
-  const apiClientImportPath = `./${apiClientFileName.replace('.ts', '')}`
-  const apiClientOutputFilePath = path.resolve(
-    process.cwd(),
-    outputDirectoryPath,
-    apiClientFileName,
-  )
-  const mockDataFileName = 'mockData.ts'
-  const mockOutputFilePath = path.resolve(
-    process.cwd(),
-    outputDirectoryPath,
-    mockDataFileName,
-  )
-  const reactQueryHooksFileName = 'reactQuery.tsx'
-  const reactQueryHooksOutputFilePath = path.resolve(
-    process.cwd(),
-    outputDirectoryPath,
-    reactQueryHooksFileName,
-  )
-
-  generateTypeDefinitions(document, {
-    outputFilePath: typeDefinitionsOutputFilePath,
-    prettyOutput,
-  })
-  generateAPIClient(document, {
-    outputFilePath: apiClientOutputFilePath,
-    typeDefinitionsImportPath,
-    prettyOutput,
-  })
-  generateMockData(document, {
-    outputFilePath: mockOutputFilePath,
-    typeDefinitionsImportPath,
-    prettyOutput,
-  })
-  generateReactQueryHooks(document, {
-    outputFilePath: reactQueryHooksOutputFilePath,
-    typeDefinitionsImportPath,
-    apiClientImportPath,
-    prettyOutput,
-  })
-}
+import { getGenerationOptions } from './functions'
+import { run } from './run'
 
 yargs(hideBin(process.argv))
   .command(
@@ -107,25 +29,67 @@ yargs(hideBin(process.argv))
         describe: 'Wether or not the output should be formatted using Prettier',
         demandOption: false,
       },
+      types: {
+        type: 'boolean',
+        default: false,
+        describe: 'Generate types',
+        demandOption: false,
+      },
+      apiClient: {
+        type: 'boolean',
+        default: false,
+        describe: 'Generate API client',
+        demandOption: false,
+      },
+      mockData: {
+        type: 'boolean',
+        default: false,
+        describe: 'Generate mock data',
+        demandOption: false,
+      },
+      reactQuery: {
+        type: 'boolean',
+        default: false,
+        describe: 'Generate `react-query` hooks & provider',
+        demandOption: false,
+      },
     },
     (argv) => {
-      if (!fileExists(argv.file)) {
-        console.log(`Invalid "${argv.file}" OpenAPI specification file path`)
-        return
+      const {
+        file,
+        outputDir,
+        prettyOutput,
+        types,
+        apiClient,
+        mockData,
+        reactQuery,
+      } = argv
+
+      if (!fileExists(file)) {
+        console.log(`Invalid "${file}" OpenAPI specification file path`)
+        process.exit(1)
       }
 
-      const directoryCreated = createDirectory(argv.outputDir)
+      const directoryCreated = createDirectory(outputDir)
       if (!directoryCreated) {
         console.log(
-          `An error ocurred while checking output directory "${argv.outputDir}"`,
+          `An error ocurred while checking output directory "${outputDir}"`,
         )
-        return
+        process.exit(1)
       }
 
+      const generationOptions = getGenerationOptions({
+        types,
+        apiClient,
+        mockData,
+        reactQuery,
+      })
+
       run({
-        openAPIFilePath: argv.file,
-        outputDirectoryPath: argv.outputDir,
-        prettyOutput: argv.prettyOutput,
+        openAPIFilePath: file,
+        outputDirectoryPath: outputDir,
+        prettyOutput,
+        generationOptions,
       }).catch(() => {
         console.log('An error ocurred')
         process.exit(1)

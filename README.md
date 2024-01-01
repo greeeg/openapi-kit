@@ -39,6 +39,25 @@ yarn add @tanstack/react-query
 }
 ```
 
+## CLI options
+
+```sh
+# Specify the OpenAPI spec file path & output directory
+openapi-kit generate -f ./openapi/pet-store.yml -o ./generated
+
+# The `prettyOutput` flag ensures the output is formatted using Prettier
+openapi-kit generate -f ./openapi/pet-store.yml -o ./generated --prettyOutput
+
+# Only generate type definitions
+openapi-kit generate -f ./openapi/pet-store.yml -o ./generated --types
+
+# Only generate type definitions & API client
+openapi-kit generate -f ./openapi/pet-store.yml -o ./generated --types --apiClient
+
+# Only generate type definitions & mock data
+openapi-kit generate -f ./openapi/pet-store.yml -o ./generated --types --mockData
+```
+
 ### Using types
 
 ```ts

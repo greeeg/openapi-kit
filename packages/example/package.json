@@ -6,6 +6,7 @@
     "start": "parcel index.html",
     "build": "parcel build index.html",
     "typecheck": "tsc --noEmit",
+    "openapi:help": "node ../openapi-kit/dist/cli.js generate --help",
     "openapi:pet-store": "node ../openapi-kit/dist/cli.js generate -f openapi/pet-store.yml -o ./generated/pet-store",
     "openapi:stripe": "node ../openapi-kit/dist/cli.js generate -f openapi/stripe.yml -o ./generated/stripe",
     "openapi:twilio": "node ../openapi-kit/dist/cli.js generate -f openapi/twilio.json -o ./generated/twilio",
