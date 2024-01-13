@@ -47,6 +47,8 @@ export const generateMockData = async (
     }
   })
 
+  lines.push('')
+
   const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
   writeFile(outputFilePath, fileContent)
   logResolvedRefsCallStackExceeded(resolvedRefs)
