@@ -40,11 +40,12 @@ export const generateAPIClient = async (
 
   lines.push(
     `  return {`,
-    ...operations.map((operation) => `${operation.camelCaseOperationId},`),
+    ...operations.map((operation) => `    ${operation.camelCaseOperationId},`),
     `  };`,
     `};`,
     '',
     'export type APIClient = ReturnType<typeof getAPIClient>',
+    '',
   )
 
   const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
