@@ -17,6 +17,7 @@ export const generateMockData = async (
   const operations = getOperations(document)
   const lines: string[] = [
     `import { Paths } from "${typeDefinitionsImportPath}";`,
+    ``,
   ]
 
   let resolvedRefs: Record<string, number> = {}
