@@ -19,11 +19,11 @@ const buildQueryParamsInterface = (
 
   return [
     `export interface ${operationName}Parameters {`,
-    ...(inPath ? [`pathParams: Paths.${operationName}.PathParameters,`] : []),
+    ...(inPath ? [`  pathParams: Paths.${operationName}.PathParameters,`] : []),
     ...(inQuery
-      ? [`queryParams: Paths.${operationName}.QueryParameters,`]
+      ? [`  queryParams: Paths.${operationName}.QueryParameters,`]
       : []),
-    ...(inBody ? [`body: Paths.${operationName}.RequestBody,`] : []),
+    ...(inBody ? [`  body: Paths.${operationName}.RequestBody,`] : []),
     `}`,
   ]
 }
@@ -71,21 +71,21 @@ export const buildQuery = ({
     }),
     ``,
     `export const use${pascalCaseOperationId} = (`,
-    ...(has ? [`parameters: ${pascalCaseOperationId}Parameters,`] : []),
+    ...(has ? [`  parameters: ${pascalCaseOperationId}Parameters,`] : []),
     `  options?: Omit<UseQueryOptions<${responseType}, unknown>,`,
     `    'queryKey' | 'queryFn'`,
     `  >`,
     `) => {`,
     `  const apiClient = useAPIClient()`,
     ...(has
-      ? [`const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
-      : [`const queryKey = get${pascalCaseOperationId}QueryKey()`]),
+      ? [`  const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
+      : [`  const queryKey = get${pascalCaseOperationId}QueryKey()`]),
     ``,
     `  return useQuery<${responseType}, unknown>({`,
     `    queryKey,`,
     `    queryFn: async () => {`,
     `      const response = await apiClient.${camelCaseOperationId}(`,
-    ...(has ? ['parameters'] : []),
+    ...(has ? ['        parameters'] : []),
     `      )`,
     ``,
     `      if (!response.ok) {`,
@@ -100,7 +100,7 @@ export const buildQuery = ({
     ``,
     `export const useLazy${pascalCaseOperationId} = (`,
     ...(has
-      ? [`parameters: Partial<${pascalCaseOperationId}Parameters>,`]
+      ? [`  parameters: Partial<${pascalCaseOperationId}Parameters>,`]
       : []),
     `  options?: Omit<UseQueryOptions<${responseType}, unknown>,`,
     `    'queryKey' | 'queryFn'`,
@@ -108,14 +108,16 @@ export const buildQuery = ({
     `) => {`,
     `  const apiClient = useAPIClient()`,
     ...(has
-      ? [`const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
-      : [`const queryKey = get${pascalCaseOperationId}QueryKey()`]),
+      ? [`  const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
+      : [`  const queryKey = get${pascalCaseOperationId}QueryKey()`]),
     ``,
     `  return useQuery<${responseType}, unknown>({`,
     `    queryKey,`,
     `    queryFn: async () => {`,
     `      const response = await apiClient.${camelCaseOperationId}(`,
-    ...(has ? [`parameters as ${pascalCaseOperationId}Parameters`] : []),
+    ...(has
+      ? [`        parameters as ${pascalCaseOperationId}Parameters`]
+      : []),
     `      )`,
     ``,
     `      if (!response.ok) {`,
@@ -128,6 +130,7 @@ export const buildQuery = ({
     `    ...options`,
     `  })`,
     `}`,
+    ``,
   ]
 }
 
@@ -158,12 +161,12 @@ export const buildMutation = ({
     `  >({`,
     ...(has
       ? [
-          `mutationFn: async (variables: ${pascalCaseOperationId}Parameters) => {`,
-          `const response = await apiClient.${camelCaseOperationId}(variables);`,
+          `    mutationFn: async (variables: ${pascalCaseOperationId}Parameters) => {`,
+          `      const response = await apiClient.${camelCaseOperationId}(variables);`,
         ]
       : [
-          `mutationFn: async () => {`,
-          `const response = await apiClient.${camelCaseOperationId}();`,
+          `    mutationFn: async () => {`,
+          `      const response = await apiClient.${camelCaseOperationId}();`,
         ]),
     ``,
     `      if (!response.ok) {`,
@@ -175,6 +178,7 @@ export const buildMutation = ({
     `    ...options`,
     `  });`,
     `};`,
+    ``,
   ]
 }
 

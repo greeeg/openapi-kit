@@ -31,8 +31,6 @@ export const generateReactQueryHooks = async (
       lines.push(...buildMutation(operation))
     })
 
-  lines.push('')
-
   const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
 
   writeFile(outputFilePath, fileContent)
