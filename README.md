@@ -86,8 +86,10 @@ const apiClient = getAPIClient({
   headers: {
     Accept: 'application/json',
   },
-  onError: (statusCode: number, response: Response) => {
-    console.log(`[network-error]: ${statusCode} status code`, response)
+  onError: (error: unknown) => {
+    if (error instanceof HTTPRequestError && error.statusCode === 401) {
+      // Do something
+    }
   },
 })
 
