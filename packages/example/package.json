@@ -13,7 +13,7 @@
     "openapi": "concurrently \"yarn run openapi:pet-store\" \"yarn run openapi:stripe\" \"yarn run openapi:github\""
   },
   "dependencies": {
-    "@tanstack/react-query": "5.17.12",
+    "@tanstack/react-query": "5.17.19",
     "query-string": "8.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
