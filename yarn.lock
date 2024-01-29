@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@anttiviljami/dtsgenerator@3.19.1":
-  version "3.19.1"
-  resolved "https://registry.yarnpkg.com/@anttiviljami/dtsgenerator/-/dtsgenerator-3.19.1.tgz#0e84474a21fb3c2e5ebbe5c61a73e1229171954d"
-  integrity sha512-FlGAPqih3CFH9YsktVDtW26UEORjlIj8alH+MR7eNad6z9Cun7M9auRUWRcrdo1pq4ES8q6PmICrev/LyyKKKg==
+"@anttiviljami/dtsgenerator@3.19.3":
+  version "3.19.3"
+  resolved "https://registry.yarnpkg.com/@anttiviljami/dtsgenerator/-/dtsgenerator-3.19.3.tgz#2c88f312878ea75e919f8f7f76feabc201a02ca9"
+  integrity sha512-MgmWXII75RM1DWZ6clslv6GGh8NfJy7Pe8OhVrINyfacmj8ocyoJd09DnQkCsLGBUupKiyJ9oJwxsVyLuhUhfg==
   dependencies:
     commander "^11.1.0"
     cross-fetch "^4.0.0"
