@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "11.0.4",
-    "@types/node": "20.11.24",
+    "@types/node": "20.11.28",
     "@types/yargs": "17.0.32",
     "concurrently": "8.2.2",
     "esbuild": "0.20.1"
