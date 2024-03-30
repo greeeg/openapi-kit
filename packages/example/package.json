@@ -10,7 +10,7 @@
     "openapi:pet-store": "node ../openapi-kit/dist/cli.js generate -f openapi/pet-store.yml -o ./generated/pet-store",
     "openapi:stripe": "node ../openapi-kit/dist/cli.js generate -f openapi/stripe.yml -o ./generated/stripe",
     "openapi:twilio": "node ../openapi-kit/dist/cli.js generate -f openapi/twilio.json -o ./generated/twilio",
-    "openapi": "concurrently \"yarn run openapi:pet-store\" \"yarn run openapi:stripe\" \"yarn run openapi:github\""
+    "openapi": "concurrently \"yarn run openapi:pet-store\" \"yarn run openapi:stripe\" \"yarn run openapi:twilio\""
   },
   "dependencies": {
     "@tanstack/react-query": "5.17.19",
