@@ -7,6 +7,37 @@ info:
 servers:
   - url: http://petstore.swagger.io/v1
 paths:
+  /pictures:
+    post:
+      summary: Upload a picture
+      operationId: uploadPicture
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The id of the picture
+                    example: '123'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /pets:
     get:
       summary: List all pets

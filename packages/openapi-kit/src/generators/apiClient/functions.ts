@@ -10,7 +10,8 @@ export const buildParamsInterface = (
   operationName: string,
   operation: OpenAPIV3.OperationObject,
 ): string[] => {
-  const { has, inBody, inPath, inQuery } = hasOperationParameters(operation)
+  const { has, inBody, inPath, inQuery, requestBodyType } =
+    hasOperationParameters(operation)
 
   if (!has) {
     return []
@@ -22,7 +23,13 @@ export const buildParamsInterface = (
     ...(inQuery
       ? [`  queryParams: Paths.${operationName}.QueryParameters,`]
       : []),
-    ...(inBody ? [`  body: Paths.${operationName}.RequestBody,`] : []),
+    ...(inBody
+      ? [
+          requestBodyType === 'formData'
+            ? `  body: FormData,`
+            : `  body: Paths.${operationName}.RequestBody,`,
+        ]
+      : []),
     `}`,
     ``,
   ]
@@ -35,7 +42,8 @@ export const buildFunction = ({
   operation,
   path,
 }: Operation) => {
-  const { has, inBody, inPath, inQuery } = hasOperationParameters(operation)
+  const { has, inBody, inPath, inQuery, requestBodyType } =
+    hasOperationParameters(operation)
   const params = has ? `params: ${pascalCaseOperationId}Params` : ''
   const type = getResponseType({ operation, pascalCaseOperationId })
 
@@ -55,9 +63,17 @@ export const buildFunction = ({
     `        }),`,
     `        {`,
     `          method: "${httpMethod}",`,
-    ...(inBody ? [`          body: JSON.stringify(params.body),`] : []),
+    ...(inBody
+      ? [
+          requestBodyType === 'formData'
+            ? `          body: params.body,`
+            : `          body: JSON.stringify(params.body),`,
+        ]
+      : []),
     `          headers: {`,
-    `            "Content-Type": "application/json",`,
+    requestBodyType === 'formData'
+      ? `            "Content-Type": "multipart/form-data",`
+      : `            "Content-Type": "application/json",`,
     `            ...headers`,
     `          },`,
     `          ...configRest`,

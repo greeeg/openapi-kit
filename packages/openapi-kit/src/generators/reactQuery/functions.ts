@@ -11,7 +11,8 @@ const buildQueryParamsInterface = (
   operationName: string,
   operation: OpenAPIV3.OperationObject,
 ): string[] => {
-  const { has, inBody, inPath, inQuery } = hasOperationParameters(operation)
+  const { has, inBody, inPath, inQuery, requestBodyType } =
+    hasOperationParameters(operation)
 
   if (!has) {
     return []
@@ -23,7 +24,13 @@ const buildQueryParamsInterface = (
     ...(inQuery
       ? [`  queryParams: Paths.${operationName}.QueryParameters,`]
       : []),
-    ...(inBody ? [`  body: Paths.${operationName}.RequestBody,`] : []),
+    ...(inBody
+      ? [
+          requestBodyType === 'formData'
+            ? `  body: FormData,`
+            : `  body: Paths.${operationName}.RequestBody,`,
+        ]
+      : []),
     `}`,
   ]
 }

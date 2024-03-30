@@ -225,6 +225,27 @@ export const resolveRef = (
   return current
 }
 
+export type RequestBodyType = 'json' | 'formData' | 'unknown'
+
+const getRequestBodyType = (
+  requestBody: OpenAPIV3.OperationObject['requestBody'],
+): RequestBodyType => {
+  if (!requestBody || '$ref' in requestBody) {
+    return 'unknown'
+  }
+
+  // Accepts multiple types
+  if (Object.keys(requestBody.content).length > 1) {
+    return 'unknown'
+  }
+
+  if ('multipart/form-data' in requestBody.content) {
+    return 'formData'
+  }
+
+  return 'json'
+}
+
 export const hasOperationParameters = (
   operation: OpenAPIV3.OperationObject,
 ) => {
@@ -235,11 +256,13 @@ export const hasOperationParameters = (
     ?.filter(isParameterObject)
     .some((param) => param.in === 'query')
   const inBody = !!operation.requestBody
+  const requestBodyType = getRequestBodyType(operation.requestBody)
 
   return {
     has: inPath || inQuery || inBody,
     inPath,
     inQuery,
     inBody,
+    requestBodyType,
   }
 }
