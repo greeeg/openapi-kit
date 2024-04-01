@@ -71,9 +71,9 @@ export const buildFunction = ({
         ]
       : []),
     `          headers: {`,
-    requestBodyType === 'formData'
-      ? `            "Content-Type": "multipart/form-data",`
-      : `            "Content-Type": "application/json",`,
+    ...(requestBodyType !== 'formData'
+      ? [`            "Content-Type": "application/json",`]
+      : []),
     `            ...headers`,
     `          },`,
     `          ...configRest`,
