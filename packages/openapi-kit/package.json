@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@anttiviljami/dtsgenerator": "3.19.1",
-    "@apidevtools/json-schema-ref-parser": "11.1.0",
+    "@apidevtools/json-schema-ref-parser": "11.6.1",
     "@faker-js/faker": "8.4.1",
     "fs-extra": "11.2.0",
     "lodash": "4.17.21",
