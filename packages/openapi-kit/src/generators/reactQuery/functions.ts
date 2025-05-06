@@ -54,7 +54,7 @@ const buildQueryKeyFunction = ({
   }
 
   return [
-    `export const get${pascalCaseOperationId}QueryKey = (parameters?: ${pascalCaseOperationId}Parameters | Partial<${pascalCaseOperationId}Parameters>) => {`,
+    `export const get${pascalCaseOperationId}QueryKey = (parameters?: ${pascalCaseOperationId}Parameters | Partial<${pascalCaseOperationId}Parameters> | SkipToken) => {`,
     `  return parameters ? ['${camelCaseOperationId}', parameters] : ['${camelCaseOperationId}']`,
     `}`,
   ]
@@ -78,7 +78,9 @@ export const buildQuery = ({
     }),
     ``,
     `export const use${pascalCaseOperationId} = (`,
-    ...(has ? [`  parameters: ${pascalCaseOperationId}Parameters,`] : []),
+    ...(has
+      ? [`  parameters: ${pascalCaseOperationId}Parameters | SkipToken,`]
+      : []),
     `  options?: Omit<UseQueryOptions<${responseType}, unknown>,`,
     `    'queryKey' | 'queryFn'`,
     `  >`,
@@ -90,7 +92,9 @@ export const buildQuery = ({
     ``,
     `  return useQuery<${responseType}, unknown>({`,
     `    queryKey,`,
-    `    queryFn: async () => {`,
+    ...(has
+      ? [`    queryFn: parameters !== skipToken ? async () => {`]
+      : [`    queryFn: async () => {`]),
     `      const response = await apiClient.${camelCaseOperationId}(`,
     ...(has ? ['        parameters'] : []),
     `      )`,
@@ -100,7 +104,7 @@ export const buildQuery = ({
     `      }`,
     ``,
     `      return response.data`,
-    `    },`,
+    ...(has ? [`    } : skipToken,`] : [`    },`]),
     `    ...options`,
     `  })`,
     `}`,
@@ -203,6 +207,8 @@ export const getHeaderLines = ({
   `  useMutation,`,
   `  UseMutationOptions,`,
   `  UseQueryOptions,`,
+  `  skipToken,`,
+  `  SkipToken,`,
   `} from "@tanstack/react-query";`,
   ``,
   `import { Paths } from "${typeDefinitionsImportPath}"`,
