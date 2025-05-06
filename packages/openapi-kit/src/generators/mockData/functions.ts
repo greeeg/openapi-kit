@@ -51,7 +51,7 @@ const randomNumber = (schema: OpenAPISchemaObject) => {
       }
     }
 
-    return faker.number.float({ min: 0, max: 99999, precision: 0.1 })
+    return faker.number.float({ min: 0, max: 99999, fractionDigits: 2 })
   })
 }
 
@@ -96,10 +96,7 @@ const randomString = (schema: OpenAPISchemaObject) => {
 const shouldPursueRefResolution = (
   currentSchema: OpenAPISchemaObject | OpenAPIRefObject | undefined,
   resolvedRefs: Record<string, number>,
-): {
-  shouldPursue: boolean
-  ref: string | undefined
-} => {
+): { shouldPursue: boolean; ref: string | undefined } => {
   if (!currentSchema) {
     return { shouldPursue: true, ref: undefined }
   }
