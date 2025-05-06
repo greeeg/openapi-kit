@@ -24,12 +24,6 @@ y.command(
       describe: 'Output directory',
       demandOption: true,
     },
-    prettyOutput: {
-      type: 'boolean',
-      default: false,
-      describe: 'Wether or not the output should be formatted using Prettier',
-      demandOption: false,
-    },
     types: {
       type: 'boolean',
       default: false,
@@ -56,15 +50,7 @@ y.command(
     },
   },
   (argv) => {
-    const {
-      file,
-      outputDir,
-      prettyOutput,
-      types,
-      apiClient,
-      mockData,
-      reactQuery,
-    } = argv
+    const { file, outputDir, types, apiClient, mockData, reactQuery } = argv
 
     if (!fileExists(file)) {
       console.log(`Invalid "${file}" OpenAPI specification file path`)
@@ -89,7 +75,6 @@ y.command(
     run({
       openAPIFilePath: file,
       outputDirectoryPath: outputDir,
-      prettyOutput,
       generationOptions,
     }).catch(() => {
       console.log('An error ocurred')

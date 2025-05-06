@@ -1,7 +1,24 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-import { ScriptTarget } from 'typescript'
+enum ScriptTarget {
+  /** @deprecated */
+  ES3 = 0,
+  ES5 = 1,
+  ES2015 = 2,
+  ES2016 = 3,
+  ES2017 = 4,
+  ES2018 = 5,
+  ES2019 = 6,
+  ES2020 = 7,
+  ES2021 = 8,
+  ES2022 = 9,
+  ES2023 = 10,
+  ES2024 = 11,
+  ESNext = 99,
+  JSON = 100,
+  Latest = 99,
+}
 
 export function toValidIdentifier(
   text: string,

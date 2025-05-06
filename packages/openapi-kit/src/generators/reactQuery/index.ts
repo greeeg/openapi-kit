@@ -1,6 +1,5 @@
 import { OpenAPIDocument } from '../../types'
 import { writeFile } from '../../utils/fileSystem'
-import { formatOutput } from '../../utils/format'
 import { getOperations } from '../../utils/openAPI'
 import { buildMutation, buildQuery, getHeaderLines } from './functions'
 import { ReactQueryGeneratorOptions } from './types'
@@ -11,7 +10,6 @@ export const generateReactQueryHooks = async (
     outputFilePath,
     typeDefinitionsImportPath,
     apiClientImportPath,
-    prettyOutput = false,
   }: ReactQueryGeneratorOptions,
 ) => {
   const lines: string[] = [
@@ -31,7 +29,5 @@ export const generateReactQueryHooks = async (
       lines.push(...buildMutation(operation))
     })
 
-  const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
-
-  writeFile(outputFilePath, fileContent)
+  writeFile(outputFilePath, lines.join('\n'))
 }

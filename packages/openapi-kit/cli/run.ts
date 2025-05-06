@@ -12,14 +12,12 @@ import { GenerationOptions } from './types'
 interface RunOptions {
   openAPIFilePath: string
   outputDirectoryPath: string
-  prettyOutput: boolean
   generationOptions: GenerationOptions
 }
 
 export const run = async ({
   openAPIFilePath,
   outputDirectoryPath,
-  prettyOutput,
   generationOptions: { types, apiClient, mockData, reactQuery },
 }: RunOptions) => {
   const filePath = path.resolve(process.cwd(), openAPIFilePath)
@@ -64,7 +62,6 @@ export const run = async ({
   if (types) {
     generateTypeDefinitions(document, {
       outputFilePath: typeDefinitionsOutputFilePath,
-      prettyOutput,
     })
   }
 
@@ -72,7 +69,6 @@ export const run = async ({
     generateAPIClient(document, {
       outputFilePath: apiClientOutputFilePath,
       typeDefinitionsImportPath,
-      prettyOutput,
     })
   }
 
@@ -80,7 +76,6 @@ export const run = async ({
     generateMockData(document, {
       outputFilePath: mockOutputFilePath,
       typeDefinitionsImportPath,
-      prettyOutput,
     })
   }
 
@@ -89,7 +84,6 @@ export const run = async ({
       outputFilePath: reactQueryHooksOutputFilePath,
       typeDefinitionsImportPath,
       apiClientImportPath,
-      prettyOutput,
     })
   }
 }

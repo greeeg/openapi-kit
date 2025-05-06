@@ -1,6 +1,5 @@
 import { OpenAPIDocument } from '../../types'
 import { writeFile } from '../../utils/fileSystem'
-import { formatOutput } from '../../utils/format'
 import { getOperations, isResponseObject } from '../../utils/openAPI'
 import { toTypeName } from '../../utils/typescript'
 import { generateMock, logResolvedRefsCallStackExceeded } from './functions'
@@ -8,11 +7,7 @@ import { MockDataGeneratorOptions } from './types'
 
 export const generateMockData = async (
   document: OpenAPIDocument,
-  {
-    outputFilePath,
-    typeDefinitionsImportPath,
-    prettyOutput = false,
-  }: MockDataGeneratorOptions,
+  { outputFilePath, typeDefinitionsImportPath }: MockDataGeneratorOptions,
 ) => {
   const operations = getOperations(document)
   const lines: string[] = [
@@ -50,7 +45,6 @@ export const generateMockData = async (
 
   lines.push('')
 
-  const fileContent = await formatOutput(lines.join('\n'), prettyOutput)
-  writeFile(outputFilePath, fileContent)
+  writeFile(outputFilePath, lines.join('\n'))
   logResolvedRefsCallStackExceeded(resolvedRefs)
 }

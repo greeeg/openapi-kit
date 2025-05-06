@@ -1,4 +1,5 @@
-import { existsSync, lstatSync, mkdirSync, outputFileSync } from 'fs-extra'
+import { existsSync, lstatSync, mkdirSync, writeFileSync } from 'fs'
+import path from 'path'
 
 export const directoryExists = (directoryPath: string) => {
   try {
@@ -23,5 +24,6 @@ export const fileExists = (filePath: string): boolean => {
 }
 
 export const writeFile = (outputFilePath: string, fileContent: string) => {
-  outputFileSync(outputFilePath, fileContent, 'utf-8')
+  mkdirSync(path.dirname(outputFilePath), { recursive: true })
+  writeFileSync(outputFilePath, fileContent, 'utf-8')
 }
