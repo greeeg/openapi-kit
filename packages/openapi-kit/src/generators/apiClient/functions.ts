@@ -50,9 +50,10 @@ export const buildFunction = ({
   return [
     `  const ${camelCaseOperationId} = async (${params}): Promise<APIClientResponse<${type}, unknown>> => {`,
     `    try {`,
+    `      const config = await onRequest?.() || {};`,
     `      const response = await fetch(`,
     `        createUrl({`,
-    `          baseUrl: config.baseUrl,`,
+    `          baseUrl,`,
     ...(inPath
       ? [
           `          path: createPath("${path}", params.pathParams),`,
@@ -74,9 +75,9 @@ export const buildFunction = ({
     ...(requestBodyType !== 'formData'
       ? [`            "Content-Type": "application/json",`]
       : []),
-    `            ...headers`,
+    `            ...config.headers`,
     `          },`,
-    `          ...configRest`,
+    `          ...config`,
     `        }`,
     `      )`,
     ``,
@@ -186,9 +187,10 @@ export const getHeaderLines = (typeDefinitionsImportPath: string) => [
   `  | APIClientSuccessResponse<DataType>`,
   `  | APIClientErrorResponse<ErrorType>`,
   ``,
-  `export interface APIClientConfig extends Omit<RequestInit, "method"> {`,
+  `export interface APIClientConfig {`,
   `  baseUrl: string;`,
   `  onError?: (error: unknown) => void;`,
+  `  onRequest?: () => Promise<Omit<RequestInit, "method">>`,
   `}`,
   ``,
   `const createPath = (path: string, pathParams?: object): string => {`,

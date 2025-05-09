@@ -26,7 +26,7 @@ export const generateAPIClient = async (
 
   lines.push(
     `export const getAPIClient = (config: APIClientConfig) => {`,
-    `  const { baseUrl, headers, onError, ...configRest } = config;`,
+    `  const { baseUrl, onRequest, onError } = config;`,
   )
 
   operations.forEach((operation) => {

@@ -109,39 +109,6 @@ export const buildQuery = ({
     `  })`,
     `}`,
     ``,
-    `export const useLazy${pascalCaseOperationId} = (`,
-    ...(has
-      ? [`  parameters: Partial<${pascalCaseOperationId}Parameters>,`]
-      : []),
-    `  options?: Omit<UseQueryOptions<${responseType}, unknown>,`,
-    `    'queryKey' | 'queryFn'`,
-    `  >`,
-    `) => {`,
-    `  const apiClient = useAPIClient()`,
-    ...(has
-      ? [`  const queryKey = get${pascalCaseOperationId}QueryKey(parameters)`]
-      : [`  const queryKey = get${pascalCaseOperationId}QueryKey()`]),
-    ``,
-    `  return useQuery<${responseType}, unknown>({`,
-    `    queryKey,`,
-    `    queryFn: async () => {`,
-    `      const response = await apiClient.${camelCaseOperationId}(`,
-    ...(has
-      ? [`        parameters as ${pascalCaseOperationId}Parameters`]
-      : []),
-    `      )`,
-    ``,
-    `      if (!response.ok) {`,
-    `        return Promise.reject(response)`,
-    `      }`,
-    ``,
-    `      return response.data`,
-    `    },`,
-    `    enabled: false,`,
-    `    ...options`,
-    `  })`,
-    `}`,
-    ``,
   ]
 }
 
