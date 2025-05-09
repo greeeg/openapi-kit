@@ -84,7 +84,9 @@ import { getAPIClient } from 'generated/apiClient'
 const apiClient = getAPIClient({
   baseUrl: 'https://petstore.swagger.io/v2',
   onRequest: () => ({
-    Authorization: 'Bearer 1234',
+    headers: {
+      Authorization: 'Bearer 1234',
+    },
   }),
   onError: (error: unknown) => {
     if (error instanceof HTTPRequestError && error.statusCode === 401) {
@@ -134,7 +136,9 @@ const App = () => {
       config={{
         baseUrl: 'https://petstore.swagger.io/v2',
         onRequest: () => ({
-          Authorization: 'Bearer 1234',
+          headers: {
+            Authorization: 'Bearer 1234',
+          },
         }),
       }}
     >

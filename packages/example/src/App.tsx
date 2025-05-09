@@ -10,9 +10,11 @@ const App = () => {
     <APIClientProvider
       config={{
         baseUrl: 'https://petstore.swagger.io/v2',
-        headers: {
-          Accept: 'application/json',
-        },
+        onRequest: async () => ({
+          headers: {
+            Accept: 'application/json',
+          },
+        }),
       }}
     >
       <QueryClientProvider client={queryClient}>
