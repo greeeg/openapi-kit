@@ -83,9 +83,9 @@ import { getAPIClient } from 'generated/apiClient'
 
 const apiClient = getAPIClient({
   baseUrl: 'https://petstore.swagger.io/v2',
-  headers: {
-    Accept: 'application/json',
-  },
+  onRequest: () => ({
+    Authorization: 'Bearer 1234',
+  }),
   onError: (error: unknown) => {
     if (error instanceof HTTPRequestError && error.statusCode === 401) {
       // Do something
@@ -133,9 +133,9 @@ const App = () => {
     <APIClientProvider
       config={{
         baseUrl: 'https://petstore.swagger.io/v2',
-        headers: {
-          Accept: 'application/json',
-        },
+        onRequest: () => ({
+          Authorization: 'Bearer 1234',
+        }),
       }}
     >
       <QueryClientProvider client={queryClient}>
